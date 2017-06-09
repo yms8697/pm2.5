@@ -7,7 +7,7 @@ import pymysql
 import json
 from urllib.parse import quote
 
-
+alldata=[]
 class SpiderMain(object):
     def __init__(self):
         self.downloader=Htmldownloder()
@@ -19,7 +19,7 @@ class SpiderMain(object):
         self.outputer.output_json(datas)
     def parser_main2(self,root_url,city):
         html= self.downloader.download(root_url)
-        datas = self.parser.parserAll(html)
+        datas = self.parser.parserAll(html,city)
         self.outputer.outputAll(datas,city)
 #html下载器
 class Htmldownloder(object):
@@ -49,12 +49,12 @@ class Htmlparser(object):
         soup=BeautifulSoup(html,'html.parser',from_encoding='utf-8')
         res_datas=self._get_data(soup)
         return res_datas
-    def parserAll(self,html):
+    def parserAll(self,html,city):
         from bs4 import BeautifulSoup
         if html is None:
             return None
         soup=BeautifulSoup(html,'html.parser',from_encoding='utf-8')
-        res_datas=self._get_allData(soup)
+        res_datas=self._get_allData(soup,city)
         return res_datas
     #获取城市,省,aqi,pm25
     def _get_data(self,soup):
@@ -75,7 +75,7 @@ class Htmlparser(object):
             res_data['pm25']=all_data4[i+1].get_text()
             res_datas.append(res_data)
         return res_datas
-    def _get_allData(self,soup):
+    def _get_allData(self,soup,city):
         
         res_datas=[]
         data=[]
@@ -88,6 +88,7 @@ class Htmlparser(object):
                 data.append(td.get_text())
         for j in range(len(tr)-1):
             res_data={}
+            res_data['city']=city
             res_data['time']=data[11*j]
             res_data['allAQI']=data[1+11*j]
             res_data['airQuality']=data[3+11*j]
@@ -105,29 +106,22 @@ class Output(object):
 #输出为json
     def output_json(self,datas):
         fout=open('dataQuery.json','w+',encoding="utf-8")
-        encodejson = json.dumps(datas)
-        print(encodejson)
+        encodejson = json.dumps(datas,ensure_ascii=False)
         fout.write(encodejson)
         fout.close()
     def outputAll(self,datas,city):
-        db = pymysql.connect(host="localhost",user="root",passwd="123456",db="pm25",charset="utf8")
-        cursor = db.cursor()
-        for data in datas:
-            sql="INSERT INTO  historydata(time,airQuality,aqi,pm25,city) VALUES('{0}','{1}','{2}','{3}','{4}')".format(data['time'],data['airQuality'],data['allAQI'],data['allPm25'],city)
-            cursor.execute(sql)
-            db.commit()
-        db.close()        
+        alldata.append(datas)
+        fout=open('historyData.json','w+',encoding="utf-8")
+        encodejson = json.dumps(alldata,ensure_ascii=False)
+        fout.write(encodejson)
+        fout.close()
 if __name__ == '__main__':
     url = "http://www.pm25.com/rank.html"
     obj_spider = SpiderMain()
     obj_spider.parser_main(url)
     cityData=["烟台","临沂","潍坊","青岛","菏泽","济宁","德州","滨州","聊城","东营","济南","泰安","威海","日照","淄博","枣庄","莱芜"]
     url2="https://www.aqistudy.cn/historydata/monthdata.php?city="
-    #db = pymysql.connect(host="localhost",user="root",passwd="123456",db="pm25",charset="utf8")
-    #cursor = db.cursor()
-    #cursor.execute("truncate historydata")
-    #db.close
-    #for i in range(len(cityData)):
-        #search= urllib.parse.quote(cityData[i])
-        #root_url=url2+search
-        #obj_spider.parser_main2(root_url,cityData[i])
+    for i in range(len(cityData)):
+        search= urllib.parse.quote(cityData[i])
+        root_url=url2+search
+        obj_spider.parser_main2(root_url,cityData[i])

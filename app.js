@@ -24,10 +24,10 @@ app.use(controller.get('/query',function*(){
 	this.set('Cache-Control','no-cache');
 	this.body =yield render('query');
 }));
-//散列画廊数据接口
-app.use(controller.get('/ajax/galleryImgDatas',function*(){
+//分析页路由
+app.use(controller.get('/analyze',function*(){
 	this.set('Cache-Control','no-cache');
-	this.body =service.get_galleryimg_data();
+	this.body =yield render('analyze');
 }));
 //实时数据接口
 app.use(controller.get('/ajax/query',function*(){
@@ -37,5 +37,13 @@ app.use(controller.get('/ajax/query',function*(){
 app.use(controller.get('/ajax/shandong',function*(){
 	this.set('Cache-Control','no-cache');
 	this.body =service.get_shandong_data();
+}));
+app.use(controller.get('/ajax/history',function*(){
+	this.set('Cache-Control','no-cache');
+	this.body =service.get_history_data();
+}));
+app.use(controller.get('/ajax/row',function*(){
+	this.set('Cache-Control','no-cache');
+	this.body =service.get_row_data();
 }));
 app.listen(3001);

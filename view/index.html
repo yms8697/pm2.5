@@ -8,8 +8,95 @@
    	<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css">
 	<style>
 		.carousel{
-			margin-top:-50px;
+			position: absolute;
+			top:52px;
+			left:0px;
+			width: 100%;
+			bottom: 0px;
+
 		}
+		.auto{
+			height:100%;
+			width: 100%;
+		}
+		.res{
+			width: 262px;
+			height:251px;
+			background: #fff;
+		}
+		.img-container{
+			width: 262px;
+			height:191px;
+		}
+		.img-container img{
+			width:100%;
+			height:100%;
+		}
+		#row {
+			width: 85%;
+			margin:0 auto;
+		}
+		.tab{
+			width:100%;
+			height: 5px;
+			background:#3ca023;
+		}
+		.des{
+			    box-shadow: 0 0 8px #b5b5b5;
+			    width: 262px;
+			    height: 60px;
+			    line-height: 60px;
+			    font-size: 16px;
+			    color: #757671;
+			    text-align: center;
+			    overflow: hidden;
+		}
+		
+		.col-sm-6{
+			margin-top: 30px;
+		}
+		.rsp{
+			width: 262px;
+		    height: 251px;
+		    overflow: hidden;
+		    position: absolute;
+		    background: #77ad59;
+		    top: 0px;
+		    left: 15px;
+		    bottom: 0px;
+		    opacity: 0;
+		}
+		.note{
+			width: 262px;
+		    height: 251px;
+			color: #fff;
+			padding: 15px;
+			position: absolute;
+		    top: 0px;
+		    left: 15px;
+		    bottom: 0px;
+		    display: none;
+		    font: 15px;
+		}
+		.subtitle h2{
+			padding-left: 15px;
+		}
+		.hr{
+			width: 100%;
+			height:5px;
+			background: #3ca023;
+			margin-left: 15px;
+		}
+		.footer-bar{
+			width: 100%;
+			height:60px;
+			background: #fffff3;
+    		box-shadow: 0 -5px 5px #999;
+    		margin-top: 30px;
+    		text-align: center;
+    		line-height: 60px;
+		}
+		
 	</style>
 </head>
 <body>
@@ -26,23 +113,20 @@
 		</ol>
 
 		<!-- Wrapper for slides -->
-		<div class="carousel-inner" role="listbox">
-		<div class="item active">
-		  <img src="/static/img/1a.jpg" alt="...">
+		<div class="carousel-inner auto" role="listbox">
+		<div class="item active auto">
+		  <img class="auto" src="/static/img/1a.jpg" alt="...">
 		  <div class="carousel-caption">
-		    ...
 		  </div>
 		</div>
-		<div class="item">
-		  <img src="/static/img/2a.jpg" alt="...">
+		<div class="item auto">
+		  <img  class="auto" src="/static/img/2a.jpg" alt="...">
 		  <div class="carousel-caption">
-		    ...
 		  </div>
 		</div>
-		<div class="item">
-		  <img src="/static/img/3a.jpg" alt="...">
+		<div class="item auto">
+		  <img  class="auto" src="/static/img/3a.jpg" alt="...">
 		  <div class="carousel-caption">
-		    ...
 		  </div>
 		</div>
 
@@ -55,16 +139,64 @@
 		<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
 		<span class="sr-only">Next</span>
 		</a>
-	</div>      
-	<script type="text/javascript" src="/static/script/vue.js"></script>
-	<script type="text/javascript" src="/static/script/zepto.js"></script>
+	</div> 
+	<div class="tab"></div>
+	<div class="row" id="row">
+		<div class="subtitle">
+			<h2>健康常识</h2>
+		</div>
+		<div class="hr"></div>
+		<div v-for="item in row"  id="{{item.id}}" class="col-sm-6 col-md-4 ">
+			
+			<div class="img-container" >
+				<img v-bind:src="item.fileName">
+			</div>
+			<div class="des" >
+				<p>{{item.title}}<p>
+			</div>
+			<div class="rsp" v-on:mouseover="show(item)" v-on:mouseout="hide(item)" ></div>
+			<div class="note" >{{item.des}}</div>
+		</div>
+	</div>
+	<div class="footer-bar">
+		<p>Copyright @ 2017 yms 869735729@qq.com </p>
+		<div class="tab"></div>
+	</div>
+	
+	<script type="text/javascript" src="/static/script/vue.js"></script>     
 	<script type="text/javascript" src="/static/script/jquery-1.9.1.min.js"></script>
-	<script type="text/javascript" src="/static/script/amazeui.js"></script>
 	<script type="text/javascript" src="/static/script/bootstrap.js"></script>
     <script type="text/javascript">
     	$('.carousel').carousel({
 		  interval: 2000
 		})
+		var vue=new Vue({
+			el: '#row',
+			data: {
+				row:[]
+			},
+			methods: {
+				dataShow: function() {
+					var _this = this;
+					$.get('/ajax/row',function(d){
+						_this.row = d.items;
+					},'json')
+				},
+				show: function(item){
+					/*var a=document.getElementById(item.id);
+					a.lastElementChild.style.display='block';
+					console.log(a.getElementsByClass('rsp'));*/
+					$('#'+item.id).find($('.note')).css('display','block');
+					$('#'+item.id).find($('.rsp')).css('opacity',0.5);
+					
+				},
+				hide:function(item){
+					$('#'+item.id).find($('.note')).css('display','none');
+					$('#'+item.id).find($('.rsp')).css('opacity',0);
+				}
+			}
+		});
+		vue.dataShow();
     </script>
 </body>
 </html>

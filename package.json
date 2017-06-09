@@ -1,7 +1,7 @@
 {
-  "name": "reader",
+  "name": "pm2.5",
   "version": "1.0.0",
-  "description": "web reader site",
+  "description": "webgis pm2.5",
   "main": "app.js",
   "dependencies": {
     "auto-reload": "^0.0.2",
@@ -11,7 +11,6 @@
     "koa-route": "^2.4.2",
     "koa-static-server": "^0.1.8",
     "koa-views": "^4.1.0",
-    "muse-ui": "^2.0.2",
     "webpack": "^1.13.1"
   },
   "devdependencies": {},
